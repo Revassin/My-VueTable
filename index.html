@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="assets/css/style.css">
+    </head>
+    </head>
+    <body id="app">
+        <div class="container">
+          <h2>Vue Table</h2>
+
+          <form id="search">
+            <label for="query">Search</label>
+            <input name="query" v-model="searchQuery">
+          </form>
+
+          <select @change="getData" v-model="itemsPerPage">
+              <option v-for="option in options" :value="option.value">
+                {{ option.text }}
+              </option>
+          </select>
+
+          <table class="table table-bordered table-striped">
+
+            <thead>
+              <tr>
+                <th><input type="checkbox" @click="selectAll()" v-model="Allselected"></th>
+                <!-- Als sortKey en header gelijk aan elkaar zijn is geef de th een active class -->
+                <th :class="{ active: sortKey == header }" @click="sortBy(header)" v-for="header in tableHeader">
+                    {{ header }}
+                    <!-- Als sortOrders lager is dan 0 dan is order gelijk aan dsc -->
+                    <!-- <span class="arrow" :class="sortOrders[header] < 0 ? 'asc' : 'dsc'">{{ sortOrders[header] }}</span> -->
+                    <span class="arrow" :class="sortOrder< 0 ? 'asc' : 'dsc'"></span>
+                </th>
+                <th>Edit</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- <tr v-for="data in tableData | orderBy sortKey sortOrders[sortKey] | filterBy searchQuery"> -->
+              <tr v-for="data in tableData | orderBy sortKey sortOrder | filterBy searchQuery">
+                 <!-- In onderstaande geven we bij data de key mee in een loop (In dit geval name en power) -->
+                <td><input type="checkbox" :value="data.id" @click="selectRow()" v-model="selectedRows"></td>
+
+                <template v-if="editable == $index">
+                    <td v-for="key in tableHeader" >
+                        <!-- !!! Onderstaande <p> is een test kan uiteindelijk weg want je toont geen ID in tables !!! -->
+                        <p v-if="data[key] == data.id" >{{ data[key] }}</p>
+                        <input v-else type="text" v-model="data[key]">
+                    </td>
+                </template >
+                <template  v-else>
+                    <td v-for="key in tableHeader" >{{ data[key] }}</td>
+                </template >
+
+                <td>
+                    <button v-if="editable == $index" type="button" class="btn btn-success" @click="saveRow($index)">Done</button>
+                    <button v-else= type="button" class="btn btn-primary" :value="$index" @click="editRow($index)">Edit</button>
+                    <button type="button" class="btn btn-danger" @click="removeRow(data)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" style="margin-right:5px;" class="pull-left btn btn-primary del-sel" @click="addRow()">Add row</button>
+          <button type="button" class="pull-left btn btn-danger del-sel" @click="removeSelected()">Delete selected</button>
+          <ul class="pull-right pagination" style="margin:0 !important;">
+              <li v-for="pageNumber in totalPages">
+                  <a href="#" @click="setPage(pageNumber)" :current="currentPage === pageNumber">{{ pageNumber+1 }}</a>
+              </li>
+          </ul>
+          </br>
+          </br>
+        </div>
+        <!-- import JS -->
+        <script src="assets/dependencies/jquery-3.0.0.js"></script>
+        <script src="assets/dependencies/vue.js"></script>
+        <script src="assets/js/main.js"></script>
+    </body>
+</html>
